@@ -1,0 +1,186 @@
+<html>
+
+<body>
+  <h1 id="score" >Life : 15 </h1>
+  <label id="loser" style="
+    font-size: 100px;
+    display: none;
+    z-index: 0;
+  " >YOU LOSE!!!</label>
+</body>
+
+</html>
+
+<script>  
+
+var lifes = 15;
+
+var diameterBall = 50;
+var time = 20;
+var numberBalls = 10;
+
+var AxisStick = 60;
+
+var create = function(){
+    // random x and y
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+    var x = Math.floor(Math.random()*width);
+    var y = Math.floor(Math.random()*height);
+    if (x>(width-50)) x = width - 50;
+    if (y>(height-50)) y = height - 50;
+
+    // random color
+    var r = Math.floor(255*(Math.random()));
+    var g = Math.floor(255*(Math.random()));
+    var b = Math.floor(255*(Math.random()));        
+    var color = 'rgb(' + r + ', ' + g + ', ' + b + ')';
+
+    // set div attributes
+    var div = document.createElement('div');
+    div.id = 'ball';
+    div.style.zIndex = '1';
+    div.style.position = 'absolute';    
+    div.style.left = x + 'px';    
+    div.style.top = y + 'px';    
+    div.style.width = '50px';    
+    div.style.height = '50px';    
+    div.style.borderRadius = '50%';
+    div.style.background = color;    
+
+    // Then append the whole thing onto the body
+    document.getElementsByTagName('body')[0].appendChild(div);
+
+    // default start position
+    div.positionX = x;
+    div.positionY = y;
+    div.velocityX = 5;
+    div.velocityY = 5;
+    div.goRight = true;
+    div.goDown = true;
+    div.idInterval = -1;
+
+    return div;        
+}
+
+var moveBall = function (ball){
+  //debugger;
+  if(ball.goRight)
+    ball.positionX = ball.positionX + ball.velocityX;
+  else
+    ball.positionX = ball.positionX - ball.velocityX;
+
+  if(ball.goDown)
+    ball.positionY = ball.positionY + ball.velocityY;
+  else
+    ball.positionY = ball.positionY - ball.velocityY;
+
+  if( window.innerHeight < (ball.positionY + diameterBall)){
+      ball.positionY = window.innerHeight - diameterBall;
+      ball.goDown = false;
+  }
+  else if( 0 > ball.positionY ){
+    ball.positionY = 0;
+    ball.goDown = true;
+  }
+
+  if( window.innerWidth < (ball.positionX + diameterBall)){
+    ball.positionX = window.innerWidth - diameterBall;
+    ball.goRight = false;
+  }
+  else if( 0 > ball.positionX ){
+    ball.positionX = 0;
+    ball.goRight = true;
+  }
+
+  ball.style.left = ball.positionX + 'px';  
+  ball.style.top = ball.positionY + 'px'; 
+
+  var ballHitStick = hittingStick(ball.positionX, ball.positionY);
+
+  if(ballHitStick)
+    ball.goRight = true;
+
+  if(ball.positionX == 0){
+    lifes--;
+
+    printlifes(lifes);
+
+    if(lifes == 0){
+      stopGame();
+    }
+
+  }
+
+}
+
+function hittingStick (ballX, ballY){
+
+  if(ballX <= AxisStick){
+    if( ballY < (stick.posY-diameterBall) || ballY > (stick.posY+100))
+      return false;
+    else
+      return true;  
+  }else{
+      return false;
+  }
+
+}
+
+function stopGame(){
+  window.clearInterval(1);
+  window.clearInterval(2);
+
+  document.getElementById("loser").style.display = "block";
+
+}
+
+function printlifes(l){
+  document.getElementById("score").innerText = "Lifes : " + l; 
+}
+
+
+var balls = [];
+
+
+var b = 0;
+
+while(b < numberBalls){  
+  balls.push(create());  
+  b++;
+}
+
+setInterval(()=>{
+  var b2 = 0
+  while(b2 < numberBalls ){
+    moveBall(balls[b2]);
+    b2++;
+  }
+  
+}, time)
+
+//-----------------mouse
+
+var stick = create();
+stick.style.borderRadius = '0%';
+stick.style.background = 'black';
+stick.style.left = '50px';
+stick.style.width = '10px';
+stick.style.height = '100px';
+
+var currentEvent;
+
+document.documentElement.onmousemove=function(event){
+  currentEvent=event;
+}
+
+var idStickInterval = setInterval( ()=>{ 
+
+    var mY = currentEvent.screenY - 153;
+    stick.style.top = mY + 'px'
+    stick.posY = mY;
+
+  }, 50 );
+
+// ----------------
+</script>
